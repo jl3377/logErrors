@@ -1,0 +1,2 @@
+# logErrors
+Log errors Class
