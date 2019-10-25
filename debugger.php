@@ -128,23 +128,3 @@ class debugguer {
     }
 
 }
-
-
-
-if (class_exists ('debugguer')) {
-
-    $debugguer = new debugguer(true);
-    // control de errores en ejecución
-
-    $debugguer->log_to_mail("La conexión hacia la DB ha fallado", "jose@artegrafico.net");
-    $debugguer->log("Se ha producido un error1 ...");
-    $debugguer->log("Se ha producido un error2 ...", "error");
-    $debugguer->log("Pedido inferior a 5€ ...", "info");
-    $debugguer->log("Se ha producido un error crítico ...", "critical");
-    $debugguer->log("No se pudo conectar con la Base de Datos ...", "fatal");
-
-    // mensaje de error en un fichero de log determinado
-    //error_log("Error Grave en dominio.com <br />No se ha podido conectar con la BD...", 3, "logs/critical.log");
-
-}
-
