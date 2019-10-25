@@ -1,11 +1,21 @@
 <?php
-
 /**
- * Clase para controlar errores
+ * Classe to log custom errors
  *
- * Uso
+ ** How To Use
  * $debugguer = new debugguer(true); // true (activada) false (desactivado)
- * $debugguer->log("error"); // escribir un error personalizado
+ *
+ * Log a default error
+ * $debugguer->log("Se ha producido un error1 ...");
+ * $debugguer->log("Se ha producido un error2 ...", "error");
+ *
+ * Log error to file info.log, critical.log, fatal.log
+ * $debugguer->log("Pedido inferior a 5€ ...", "info");
+ * $debugguer->log("Se ha producido un error crítico ...", "critical");
+ * $debugguer->log("No se pudo conectar con la Base de Datos ...", "fatal"); *
+ *
+ * Send Log to email
+ * $debugguer->log_to_mail("La conexión hacia la DB ha fallado", "jose@artegrafico.net"); *
  *
  * @author José Luis Rojo <jose@artegrafico.net>
  * @version 0.0.1
@@ -16,6 +26,7 @@
 class debugguer {
 
     public $_options = [];
+    public $_logs_dir = "logs/";
 
     public function __construct( $status ) {
 
@@ -33,8 +44,8 @@ class debugguer {
 
         // init_Set options
         $this->_options = [
-            //'error_reporting', -1,
-            'display_errors' => 0, // muestra errores en pantalla
+            'error_reporting', E_ALL,
+            'display_errors' => 1, // muestra errores en pantalla
             'html_errors' => 1, // muestra errores con ayudas
             'log_errors' => 1, // guarda los errores en un fichero
             'log_errors_max_len' => 0, // mostrar la descripción del error al completo
@@ -44,12 +55,28 @@ class debugguer {
             'error_log' =>  'logs/error.log', // el fichero de errores
         ];
 
+        //echo print_r($this->_options);
+
         return $this->_options;
 
     }
 
     /**
+     * send mail
+     */
+    public function log_to_mail( $error, $email ) {
+
+        $headers = 'Content-Type: text/html; charset=utf-8' . "\r\n";
+        $headers .= 'From: jose@aregrafico.net' . "\r\n";
+        $headers .= 'Reply-To: jose@artegrafico.net' . "\r\n";
+        $headers .= 'X-Mailer: PHP/' . phpversion();
+        error_log( $error, 1, $email, $headers);
+
+    }
+
+    /**
      * Init options
+     * @link https://www.php.net/manual/es/function.ini-set.php
      */
     public function init() {
 
@@ -62,28 +89,62 @@ class debugguer {
     }
 
     /**
+     * return actual date
+     * @link https://www.php.net/manual/es/class.datetime.php
+     */
+    public function date() {
+
+        $datetimeFormat = 'd-m-Y H:i:s';
+        $date = new \DateTime('now', new \DateTimeZone('Europe/Madrid'));
+        $this->_date = $date->format($datetimeFormat);
+        return '['.$this->_date.']';
+
+    }
+
+    /**
      * log custom error
      * @param string $error
+     * @param string $type
+     * @link https://www.php.net/manual/es/function.error-log.php
      */
-    public function log( $error ) {
+    public function log( $error, $type = null ) {
 
-        error_log( $error );
+        // custom level 3
+        $level = 3;
+
+        // default log type
+        ( empty($type) ) ?  $type =  'error' : '';
+
+        // file
+        $this->_file = $type.".log";
+
+        // log error
+        error_log(
+            $this->date().' '.$error."\n",
+            $level,
+            $this->_logs_dir.$this->_file
+        );
 
     }
 
 }
 
 
-// how to use
+
 if (class_exists ('debugguer')) {
 
     $debugguer = new debugguer(true);
     // control de errores en ejecución
 
-    $debugguer->log("La conexión al la DB produjo un error ...");
-    $sql = " select * from productos where precio < 1 ";
-    $debugguer->log("consulta SQL ".$sql);
+    $debugguer->log_to_mail("La conexión hacia la DB ha fallado", "jose@artegrafico.net");
+    $debugguer->log("Se ha producido un error1 ...");
+    $debugguer->log("Se ha producido un error2 ...", "error");
+    $debugguer->log("Pedido inferior a 5€ ...", "info");
+    $debugguer->log("Se ha producido un error crítico ...", "critical");
+    $debugguer->log("No se pudo conectar con la Base de Datos ...", "fatal");
+
+    // mensaje de error en un fichero de log determinado
+    //error_log("Error Grave en dominio.com <br />No se ha podido conectar con la BD...", 3, "logs/critical.log");
 
 }
-
 
