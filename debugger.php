@@ -24,7 +24,7 @@
  * @link https://github.com/jl3377/logErrors
  *
  */
-class debugguer {
+class debugguer extends Exception {
 
     public $_options = [];
     public $_logs_dir = "logs/";
@@ -46,8 +46,8 @@ class debugguer {
         // init_Set options
         $this->_options = [
             'error_reporting', E_ALL,
-            'display_errors' => 1, // muestra errores en pantalla
-            'html_errors' => 1, // muestra errores con ayudas
+            'display_errors' => 0, // muestra errores en pantalla (no recomendable)
+            'html_errors' => 0, // muestra errores con ayudas
             'log_errors' => 1, // guarda los errores en un fichero
             'log_errors_max_len' => 0, // mostrar la descripción del error al completo
             'ignore_repeated_errors' => 1, // ignorar errores que se repitan
@@ -128,24 +128,16 @@ class debugguer {
 
     }
 
-}
+    /**
+     * control custom expceptions
+     */
+    public function error() {
 
-
-
-if (class_exists ('debugguer')) {
-
-    $debugguer = new debugguer(true);
-    // control de errores en ejecución
-
-    $debugguer->log_to_mail("La conexión hacia la DB ha fallado", "jose@artegrafico.net");
-    $debugguer->log("Se ha producido un error1 ...");
-    $debugguer->log("Se ha producido un error2 ...", "error");
-    $debugguer->log("Pedido inferior a 5€ ...", "info");
-    $debugguer->log("Se ha producido un error crítico ...", "critical");
-    $debugguer->log("No se pudo conectar con la Base de Datos ...", "fatal");
-
-    // mensaje de error en un fichero de log determinado
-    //error_log("Error Grave en dominio.com <br />No se ha podido conectar con la BD...", 3, "logs/critical.log");
+        $error = 'Error línea '.$this->getLine();
+        $error .= ' en '.$this->getFile();
+        $error .= ' <strong>'.$this->getMessage().'</strong>';
+        return $error;
+    }
 
 }
 
