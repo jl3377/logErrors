@@ -15,7 +15,14 @@
  * $debugguer->log("No se pudo conectar con la Base de Datos ...", "fatal"); *
  *
  * Send Log to email
- * $debugguer->log_to_mail("La conexión hacia la DB ha fallado", "jose@artegrafico.net"); *
+ * $debugguer->log_to_mail("La conexión hacia la DB ha fallado", "jose@artegrafico.net");
+ *
+ * Use try .. catch block
+ * try {
+ *    throw new debugguer( " tipo de error " );
+ * } catch ( debugguer $e ) {
+ *    echo $e->error();
+ * }
  *
  * @author José Luis Rojo <jose@artegrafico.net>
  * @version 0.0.1
@@ -50,7 +57,7 @@ class debugguer extends Exception {
             'html_errors' => 0, // muestra errores con ayudas
             'log_errors' => 1, // guarda los errores en un fichero
             'log_errors_max_len' => 0, // mostrar la descripción del error al completo
-            'ignore_repeated_errors' => 1, // ignorar errores que se repitan
+            'ignore_repeated_errors' => 0, // ignorar errores que se repitan
             'error_prepend_string' => '<div style="color:#ff0000">',
             'error_append_string' => '</div>',
             'error_log' =>  'logs/error.log', // el fichero de errores
